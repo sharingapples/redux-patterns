@@ -8,4 +8,4 @@ export {
   observe,
   observeStore,
   shallowEqual,
-}
+};

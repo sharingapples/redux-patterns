@@ -1,5 +1,13 @@
 # redux-patterns
-## PartialReducer usage
+* PartialReducer
+* observer
+  - observeStore
+  - observe Component
+
+## PartialReducer
+A partial reducer encourages defining an action and it's
+corresponding reducer effect at the same place.
+
 ```javascript
 const partialReducer = new PartialReducer();
 
@@ -36,7 +44,9 @@ export const reducer = partialReducer.getReducer();
 
 ```
 
-## observe usage
+## observe
+An observe component reacts to changes on value without
+any concern on how the value had changed.
 ```javascript
 const DisplayPage = ({ appointments }) => {
   if (appointments === null) {

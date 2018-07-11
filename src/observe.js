@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-unresolved
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import observeStore from './observeStore';
 
@@ -13,19 +13,40 @@ const strictEqual = (a, b) => a === b;
 
 export default function observe(observation, select, { isEqual = strictEqual }) {
   return (Target) => {
-    class Observed extends Component {
+    class Observed extends PureComponent {
+      state = {};
+
       componentDidMount() {
         const { store } = this.context;
-        this.unsubsribe = observeStore(store, select, observation, isEqual);
+        this.unsubsribe = observeStore(
+          store,
+          select,
+          observation,
+          {
+            isEqual,
+            dispatch: store.dispatch,
+            setProps: this.setStateOnMounted,
+          }
+        );
       }
 
       componentWillUnmount() {
         this.unsubsribe();
+        this.unsubsribe = null;
+      }
+
+      setStateOnMounted = (newState) => {
+        // The unsubscibe is set only after the component is mounted
+        if (this.unsubsribe) {
+          return this.setState(newState);
+        }
+
+        return null;
       }
 
       render() {
         return (
-          <Target {...this.props} />
+          <Target {...this.props} {...this.state} />
         );
       }
     }

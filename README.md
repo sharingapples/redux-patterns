@@ -60,16 +60,20 @@ const DisplayPage = ({ appointments }) => {
   );
 }
 
-const observation = (month, dispatch) => {
+const observation = (month, { dispatch, setProps }) => {
   // clear the appointments
-  dispatch(clearAppointments());
+  // dispatch(clearAppointments());
+  setProps({ appointments: null });
 
   // Make an api call to get all the appointments
   const appointments = await api.getAppointments(month);
 
   // Update the appointments
-  dispatch(setAppointments(appointments));
+  // dispatch(setAppointments(appointments));
+  setProps({ appointments });
 };
+
+const getMonth = state => `${state.year}-${state.month}`;
 
 export connect(mapStateToProps)(observe(observation, getMonth)(DisplayPage));
 ```

@@ -1,13 +1,14 @@
 {
   "name": "redux-patterns",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A redux based patterns",
   "main": "cjs/index.js",
   "scripts": {
     "clean": "rimraf cjs",
+    "flow": "flow-copy-source src cjs",
     "lint": "eslint src",
     "build": "babel src -d cjs",
-    "prepare": "npm run lint && npm run clean && npm run build"
+    "prepare": "npm run lint && npm run clean && npm run build && npm run flow"
   },
   "author": "Ranjan Shrestha",
   "license": "MIT",
@@ -15,6 +16,7 @@
     "babel-cli": "^6.26.0",
     "babel-eslint": "^8.2.5",
     "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-plugin-transform-react-jsx": "^6.24.1",
     "babel-preset-env": "^1.7.0",
@@ -24,6 +26,7 @@
     "eslint-plugin-import": "^2.12.0",
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.9.1",
+    "flow-copy-source": "^2.0.1",
     "rimraf": "^2.6.2"
   },
   "peerDependencies": {

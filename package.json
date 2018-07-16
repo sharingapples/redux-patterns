@@ -3,6 +3,9 @@
   "version": "0.1.2",
   "description": "A redux based patterns",
   "main": "cjs/index.js",
+  "files": [
+    "cjs"
+  ],
   "scripts": {
     "clean": "rimraf cjs",
     "flow": "flow-copy-source src cjs",

@@ -11,6 +11,7 @@ export type NormalizedState<T: Entity> = {
 };
 
 export type UpdateFn<T: Entity> = (T, number, Array<string>) => any;
+export type ReduceFn<T: Entity> = (any, T, number, Array<string>) => any;
 
 export function get<T:Entity>(state: NormalizedState<T>, id: string): T {
   return state.byId[id];
@@ -95,6 +96,10 @@ export function forEach<T: Entity>(state: NormalizedState<T>, fn: UpdateFn<T>) {
 
 export function map<T: Entity>(state: NormalizedState<T>, fn: UpdateFn<T>) {
   return state.allIds.map((id, idx, src) => fn(state.byId[id], idx, src));
+}
+
+export function reduce<T: Entity>(state: NormalizedState<T>, fn: ReduceFn<T>) {
+  return state.allIds.reduce((res, id, idx, src) => fn(res, state.byId[id], idx, src));
 }
 
 export type TruthyFn<T: Entity> = (T, number, Array<string>) => boolean;

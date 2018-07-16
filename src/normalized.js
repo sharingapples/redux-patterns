@@ -16,6 +16,10 @@ export function get<T:Entity>(state: NormalizedState<T>, id: string): T {
   return state.byId[id];
 }
 
+export function allIds(state: NormalizedState<*>) : Array<string> {
+  return state.allIds;
+}
+
 export function getAt<T: Entity>(state: NormalizedState<T>, index: number): T {
   return state.byId[state.allIds[index]];
 }
@@ -83,6 +87,10 @@ export function updateAll<T: Entity>(state: NormalizedState<T>, updater: UpdateF
       [id]: updater(state.byId[id], idx, src),
     }), {}),
   };
+}
+
+export function forEach<T: Entity>(state: NormalizedState<T>, fn: UpdateFn<T>) {
+  state.allIds.forEach((id, idx, src) => fn(state.byId[id], idx, src));
 }
 
 export function map<T: Entity>(state: NormalizedState<T>, fn: UpdateFn<T>) {

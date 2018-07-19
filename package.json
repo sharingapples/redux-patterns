@@ -1,6 +1,6 @@
 {
   "name": "redux-patterns",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "A redux based patterns",
   "repository": "github:sharingapples/redux-patterns",
   "main": "cjs/index.js",
@@ -19,6 +19,7 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-eslint": "^8.2.5",
+    "babel-jest": "^23.4.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
@@ -31,6 +32,8 @@
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.9.1",
     "flow-copy-source": "^2.0.1",
+    "jest": "^23.4.1",
+    "react": "^16.4.1",
     "rimraf": "^2.6.2"
   },
   "peerDependencies": {

@@ -90,6 +90,10 @@ export function updateAll<T: Entity>(state: NormalizedState<T>, updater: UpdateF
   };
 }
 
+export function all<T: Entity>(state: NormalizedState<T>) {
+  return state.allIds.map(id => state.byId[id]);
+}
+
 export function forEach<T: Entity>(state: NormalizedState<T>, fn: UpdateFn<T>) {
   state.allIds.forEach((id, idx, src) => fn(state.byId[id], idx, src));
 }

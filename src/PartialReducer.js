@@ -1,6 +1,11 @@
 class PartialReducer {
   constructor() {
     this.reducers = {};
+    this.initialState = {};
+  }
+
+  setInitialState(part) {
+    Object.assign(this.initialState, part);
   }
 
   add(type, partialReducer) {
@@ -17,7 +22,7 @@ class PartialReducer {
   }
 
   getReducer() {
-    return (state, action) => {
+    return (state = this.initialState, action) => {
       const partialReducer = this.reducers[action.type];
       if (!partialReducer) {
         return state;

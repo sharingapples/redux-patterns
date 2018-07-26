@@ -11,7 +11,7 @@ const storeShape = PropTypes.shape({
 
 const strictEqual = (a, b) => a === b;
 
-export default function observe(observation, select, { isEqual = strictEqual }) {
+export default function observe(observation, select, { isEqual = strictEqual } = {}) {
   return (Target) => {
     class Observed extends PureComponent {
       state = {};

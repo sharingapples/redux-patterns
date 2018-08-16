@@ -72,6 +72,24 @@ export function update<T: Entity>(
   };
 }
 
+export function remove<T: Entity>(
+  state: NormalizedState<T>,
+  record: T
+) {
+  // First make sure the record is in the state
+  if (!state.byId[record.id]) {
+    return state;
+  }
+
+  // Create a copy, its much easier
+  const copy = Object.assign({}, state.byId);
+  delete copy(record.id);
+  return {
+    allIds: state.allIds,
+    byId: copy,
+  };
+}
+
 export function updateAt<T: Entity>(
   state: NormalizedState<T>,
   idx: number,

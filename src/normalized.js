@@ -57,11 +57,17 @@ export function update<T: Entity>(
   updateId: string,
   updater: UpdateFn<T>
 ) {
+  const src = state.byId[updateId];
+  const modified = updater(src);
+  if (src === modified) {
+    return state;
+  }
+
   return {
     allIds: state.allIds,
-    byId: state.allIds.reduce((res, id, idx, src) => ({
+    byId: state.allIds.reduce((res, id) => ({
       ...res,
-      [id]: id !== updateId ? state.byId[id] : updater(state.byId[id], idx, src),
+      [id]: id !== updateId ? state.byId[id] : modified,
     }), {}),
   };
 }

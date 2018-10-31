@@ -1,6 +1,6 @@
 {
   "name": "redux-patterns",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "A redux based patterns",
   "repository": "github:sharingapples/redux-patterns",
   "main": "dist/index.js",

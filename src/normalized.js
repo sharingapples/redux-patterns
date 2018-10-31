@@ -25,6 +25,10 @@ export function getAt<T: Entity>(state: NormalizedState<T>, index: number): T {
   return state.byId[state.allIds[index]];
 }
 
+export function getAtTurn<T: Entity>(state: NormalizedState<T>, turn: number): T {
+  return getAt(state, turn % state.allIds.length);
+}
+
 export function length<T: Entity>(state: NormalizedState<T>): number {
   return state.allIds.length;
 }
@@ -102,6 +106,14 @@ export function updateAt<T: Entity>(
       [id]: idx !== i ? state.byId[id] : updater(state.byId[id], i, src),
     }), {}),
   };
+}
+
+export function updateAtTurn<T: Entity>(
+  state: NormalizedState<T>,
+  turn: number,
+  updater: UpdateFn<T>
+) {
+  return updateAt(state, turn % state.allIds.length, updater);
 }
 
 export function updateAll<T: Entity>(state: NormalizedState<T>, updater: UpdateFn<T>) {

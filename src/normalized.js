@@ -12,6 +12,7 @@ export type NormalizedState<T: Entity> = {
 
 export type UpdateFn<T: Entity> = (T, number, Array<string>) => any;
 export type ReduceFn<T: Entity> = (any, T, number, Array<string>) => any;
+export type FilterFn<T: Entity> = (T, number, Array<T>) => any;
 
 export function get<T:Entity>(state: NormalizedState<T>, id: string): T {
   return state.byId[id];
@@ -138,8 +139,12 @@ export function map<T: Entity>(state: NormalizedState<T>, fn: UpdateFn<T>) {
   return state.allIds.map((id, idx, src) => fn(state.byId[id], idx, src));
 }
 
-export function reduce<T: Entity>(state: NormalizedState<T>, fn: ReduceFn<T>) {
-  return state.allIds.reduce((res, id, idx, src) => fn(res, state.byId[id], idx, src));
+export function filter<T: Entity>(state: NormalizedState<T>, fn: FilterFn<T>) {
+  return state.allIds.filter((id, idx, src) => fn(state.byId[id], idx, src));
+}
+
+export function reduce<T: Entity>(state: NormalizedState<T>, fn: ReduceFn<T>, initial) {
+  return state.allIds.reduce((res, id, idx, src) => fn(res, state.byId[id], idx, src), initial);
 }
 
 export type TruthyFn<T: Entity> = (T, number, Array<string>) => boolean;

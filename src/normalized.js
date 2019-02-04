@@ -77,6 +77,23 @@ export function update<T: Entity>(
   };
 }
 
+export function replace<T: Entity>(state: NormalizedState<T>, record) {
+  const byId = Object.assign({}, state.byId);
+  byId[record.id] = record;
+
+  if (!state.byId[record.id]) {
+    return {
+      allIds: state.allIds.concat(record.id),
+      byId,
+    };
+  }
+
+  return {
+    allIds: state.allIds,
+    byId,
+  };
+}
+
 export function remove<T: Entity>(
   state: NormalizedState<T>,
   id: string

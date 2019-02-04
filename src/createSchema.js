@@ -25,7 +25,7 @@ export default function createSchema(name) {
 
         switch (action.type) {
           case POPULATE:
-            return create(state, action.payload);
+            return create(action.payload);
 
           case INSERT:
             return concat(state, action.payload);

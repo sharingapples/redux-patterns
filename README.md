@@ -4,6 +4,24 @@
   - observeStore
   - observe Component
 
+## Schema
+```javascript
+import { createSchema } from 'redux-patterns'
+
+const user = createSchema('user');
+
+// Create specific reducers
+const reducer = combineReducers({
+  user: user.reducer([{ id: 0, name: 'Zero' }]), // Initialize with initial records
+});
+
+// Schema specific actions
+store.dispatch(user.insert({ id: 1, name: 'john' }));
+store.dispatch(user.delete(1));
+store.dispatch(user.update({ id: 1, name: 'jane', type: 'admin' }));
+store.dispatch(user.replace({ id: 1, name: 'smith' }));
+```
+
 ## PartialReducer
 A partial reducer encourages defining an action and it's
 corresponding reducer effect at the same place.

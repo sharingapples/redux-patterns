@@ -1,14 +1,16 @@
 import {
-  create, concat, remove, update,
+  create, concat, remove, update, replace,
 } from './normalized';
 
 const INSERT = 'insert';
 const DELETE = 'delete';
 const UPDATE = 'update';
 const REPLACE = 'replace';
+const POPULATE = 'populate';
 
 export default function createSchema(name) {
   return {
+    populate: records => ({ type: POPULATE, schema: name, payload: records }),
     insert: record => ({ type: INSERT, schema: name, payload: record }),
     delete: id => ({ type: DELETE, schema: name, payload: id }),
     update: record => ({ type: UPDATE, schema: name, payload: record }),
@@ -22,6 +24,9 @@ export default function createSchema(name) {
         }
 
         switch (action.type) {
+          case POPULATE:
+            return create(state, action.payload);
+
           case INSERT:
             return concat(state, action.payload);
 
@@ -35,7 +40,7 @@ export default function createSchema(name) {
             }));
 
           case REPLACE:
-            return update(state, action.payload.id, () => action.payload);
+            return replace(state, action.payload);
 
           default:
             if (extension) {

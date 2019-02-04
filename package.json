@@ -10,6 +10,7 @@
     "src"
   ],
   "scripts": {
+    "test": "jest",
     "clean": "rimraf dist",
     "flow": "flow-copy-source src dist",
     "lint": "eslint src",

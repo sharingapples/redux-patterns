@@ -79,18 +79,18 @@ export function update<T: Entity>(
 
 export function remove<T: Entity>(
   state: NormalizedState<T>,
-  record: T
+  id: string
 ) {
   // First make sure the record is in the state
-  if (!state.byId[record.id]) {
+  if (!state.byId[id]) {
     return state;
   }
 
   // Create a copy, its much easier
   const copy = Object.assign({}, state.byId);
-  delete copy(record.id);
+  delete copy[id];
   return {
-    allIds: state.allIds,
+    allIds: state.allIds.filter(i => i !== id),
     byId: copy,
   };
 }

@@ -1,37 +1,91 @@
-import { createSchema, normalized } from '../src';
+import { createSchema, normalized, createIndex } from '../src';
 
 describe('createSchema specification', () => {
   it('checks for basic usage', () => {
     const schema = createSchema('scheme');
-    const reducer = schema.reducer([]);
-    let state = reducer(undefined, schema.insert({ id: 1, name: 'John Doe' }));
-    expect(normalized.all(state)).toEqual([{ id: 1, name: 'John Doe' }]);
-    state = reducer(state, schema.insert({ id: 2, name: 'Jane Doe' }));
-    state = reducer(state, schema.insert({ id: 3, name: 'J Doe' }));
+    const index = createIndex('departmentId', 'positionId');
+    const initalValue = {
+      id: 1,
+      name: 'John Doe',
+      departmentId: 3,
+      positionId: 2,
+    };
+    const reducer = schema.reducer([initalValue], [index]);
+
+
+    let state = reducer(undefined, schema.insert({
+      id: 2, name: 'Lore Epsum', departmentId: 3, positionId: 5,
+    }));
+
     expect(normalized.all(state)).toEqual([
-      { id: 1, name: 'John Doe' },
-      { id: 2, name: 'Jane Doe' },
-      { id: 3, name: 'J Doe' },
+      initalValue,
+      {
+        id: 2, name: 'Lore Epsum', departmentId: 3, positionId: 5,
+      },
     ]);
 
-    state = reducer(state, schema.update({ id: 2, type: 'F' }));
+    const johnDoe = normalized.get(state, initalValue.id);
+    expect(index.value(johnDoe)).toEqual(`${initalValue.departmentId}:${initalValue.positionId}`);
+
+    // insert
+    state = reducer(state, schema.insert({
+      id: 3, name: 'Jane Doe', departmentId: 3, positionId: 8,
+    }));
+    state = reducer(state, schema.insert({ id: 4, name: 'J Doe' }));
+
     expect(normalized.all(state)).toEqual([
-      { id: 1, name: 'John Doe' },
-      { id: 2, name: 'Jane Doe', type: 'F' },
-      { id: 3, name: 'J Doe' },
+      initalValue,
+      {
+        id: 2, name: 'Lore Epsum', departmentId: 3, positionId: 5,
+      },
+      {
+        id: 3, name: 'Jane Doe', departmentId: 3, positionId: 8,
+      },
+      { id: 4, name: 'J Doe' },
     ]);
 
-    state = reducer(state, schema.replace({ id: 2, name: 'jane D' }));
+
+    // update
+    state = reducer(state, schema.update({
+      id: 2, name: 'Lore Epsum', departmentId: 2, positionId: 6,
+    }));
     expect(normalized.all(state)).toEqual([
-      { id: 1, name: 'John Doe' },
-      { id: 2, name: 'jane D' },
-      { id: 3, name: 'J Doe' },
+      initalValue,
+      {
+        id: 2, name: 'Lore Epsum', departmentId: 2, positionId: 6,
+      },
+      {
+        id: 3, name: 'Jane Doe', departmentId: 3, positionId: 8,
+      },
+      { id: 4, name: 'J Doe' },
     ]);
 
-    state = reducer(state, schema.delete(2));
+    const loreEpsum = normalized.get(state, 2);
+    expect(index.value(loreEpsum)).toEqual('2:6');
+
+    // replace
+    state = reducer(state, schema.replace({ id: 3, name: 'jane D' }));
     expect(normalized.all(state)).toEqual([
-      { id: 1, name: 'John Doe' },
-      { id: 3, name: 'J Doe' },
+      initalValue,
+      {
+        id: 2, name: 'Lore Epsum', departmentId: 2, positionId: 6,
+      },
+      { id: 3, name: 'jane D' },
+      { id: 4, name: 'J Doe' },
+    ]);
+
+    const jane = normalized.get(state, 3);
+    expect(index.value(jane)).toEqual(':');
+
+
+    // delete
+    state = reducer(state, schema.delete(3));
+    expect(normalized.all(state)).toEqual([
+      initalValue,
+      {
+        id: 2, name: 'Lore Epsum', departmentId: 2, positionId: 6,
+      },
+      { id: 4, name: 'J Doe' },
     ]);
   });
 });

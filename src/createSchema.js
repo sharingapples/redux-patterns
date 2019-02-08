@@ -12,8 +12,10 @@ function forUpdate(key, res, prevKey, newKey, id) {
   if (newKey === prevKey) {
     return res;
   }
+
   const prevList = res[key][prevKey] || [];
   const newList = res[key][newKey] || [];
+
   return {
     ...res,
     [key]: {

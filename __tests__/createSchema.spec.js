@@ -24,6 +24,12 @@ describe('createSchema specification', () => {
       },
     ]);
 
+    const firstIndex = index.allIds(state, '3:2');
+    expect(firstIndex[0]).toEqual(1);
+
+    const secondIndex = index.allIds(state, '3:5');
+    expect(secondIndex[0]).toEqual(2);
+
     const johnDoe = normalized.get(state, initalValue.id);
     expect(index.value(johnDoe)).toEqual(`${initalValue.departmentId}:${initalValue.positionId}`);
 
@@ -62,6 +68,9 @@ describe('createSchema specification', () => {
 
     const loreEpsum = normalized.get(state, 2);
     expect(index.value(loreEpsum)).toEqual('2:6');
+
+    const updatedIndex = index.allIds(state, '2:6');
+    expect(updatedIndex[0]).toEqual(2);
 
     // replace
     state = reducer(state, schema.replace({ id: 3, name: 'jane D' }));

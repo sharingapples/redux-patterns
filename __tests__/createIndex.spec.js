@@ -56,9 +56,10 @@ describe('createIndex specification', () => {
     expect(updatedIndex[0]).toEqual(6);
 
     // unique
-    const unique = index.unique(state, 'DEC');
-    console.log(unique)
-    // expect(unique.length).toEqual(4);
+    const unique = uniqueIndex.unique(state, 'DESC');
+    expect(unique).toEqual(['6', '5', '2', 'undefined']);
+
+    expect(index.unique(state, 'ASC')).toEqual(['2:6', '3:2', '3:5', ':']);
 
     // delete
     state = reducer(state, schema.delete(6));

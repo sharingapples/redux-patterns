@@ -1,7 +1,6 @@
 import {
   create, concat, remove, update, replace,
 } from './normalized';
-import { normalized } from '.';
 
 const INSERT = 'insert';
 const DELETE = 'delete';
@@ -96,10 +95,11 @@ export function createIndex(...fields) {
       return indexes[k] || [];
     },
 
-    unique: (state, order) => {
-      return order === 'ASC' ? Object.keys(state[key]).sort((a, b) => a - b)
-        : Object.keys(state[key]).sort((a, b) => b - a);
-    },
+    unique: (state, order) => (
+      order === 'ASC' ? Object.keys(state[key]).sort()
+        : Object.keys(state[key]).sort((a, b) => b - a)
+    )
+    ,
   };
 }
 

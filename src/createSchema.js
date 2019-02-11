@@ -13,8 +13,8 @@ function forUpdate(key, res, prevKey, newKey, id) {
     return res;
   }
 
-  const prevList = res[prevKey] || [];
-  const newList = res[newKey] || [];
+  const prevList = res[key][prevKey] || [];
+  const newList = res[key][newKey] || [];
 
   return {
     ...res,
@@ -31,7 +31,6 @@ export function createIndex(...fields) {
   const value = fields.length > 1
     ? (record => fields.map(f => record[f]).join(':'))
     : (record => record[fields[0]]);
-
   return {
     key,
     value,
@@ -77,12 +76,13 @@ export function createIndex(...fields) {
 
     update: (res, payload, prev) => {
       const prevRec = prev.byId[payload.id];
-      return forUpdate(res, value(prevRec), value(Object.assign({}, prevRec, payload), payload.id));
+      return forUpdate(key, res, value(prevRec),
+        value(Object.assign({}, prevRec, payload)), payload.id);
     },
 
     replace: (res, payload, prev) => {
       const prevRec = prev.byId[payload.id];
-      return forUpdate(res, value(prevRec), value(payload), payload.id);
+      return forUpdate(key, res, value(prevRec), value(payload), payload.id);
     },
 
     allIds: (state, ref) => {
@@ -105,7 +105,7 @@ export default function createSchema(name) {
     update: record => ({ type: UPDATE, schema: name, payload: record }),
     replace: record => ({ type: REPLACE, schema: name, payload: record }),
 
-    reducer: (initial, indexes, extension) => {
+    reducer: (initial, indexes = [], extension) => {
       const initialState = indexes.reduce((res, index) => (
         index.populate(res, initial)
       ), create(initial));
@@ -114,7 +114,6 @@ export default function createSchema(name) {
         if (action.schema !== name) {
           return state;
         }
-
         switch (action.type) {
           case POPULATE:
             return indexes.reduce((res, index) => (

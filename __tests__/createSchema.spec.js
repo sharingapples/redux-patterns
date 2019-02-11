@@ -1,10 +1,9 @@
-import { createSchema, createIndex, normalized } from '../src';
+import { createSchema, normalized } from '../src';
 
 describe('createSchema specification', () => {
   it('checks for basic usage', () => {
     const schema = createSchema('scheme');
-    const index = createIndex('departmentId', 'positionId');
-    const reducer = schema.reducer([], [index]);
+    const reducer = schema.reducer([], []);
     let state = reducer(undefined, schema.insert({ id: 1, name: 'John Doe' }));
     expect(normalized.all(state)).toEqual([{ id: 1, name: 'John Doe' }]);
     state = reducer(state, schema.insert({ id: 2, name: 'Jane Doe' }));

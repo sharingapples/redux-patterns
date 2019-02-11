@@ -3,7 +3,7 @@ import { createSchema, normalized } from '../src';
 describe('createSchema specification', () => {
   it('checks for basic usage', () => {
     const schema = createSchema('scheme');
-    const reducer = schema.reducer([], []);
+    const reducer = schema.reducer([]);
     let state = reducer(undefined, schema.insert({ id: 1, name: 'John Doe' }));
     expect(normalized.all(state)).toEqual([{ id: 1, name: 'John Doe' }]);
     state = reducer(state, schema.insert({ id: 2, name: 'Jane Doe' }));

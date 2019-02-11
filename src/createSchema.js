@@ -105,7 +105,7 @@ export default function createSchema(name) {
     update: record => ({ type: UPDATE, schema: name, payload: record }),
     replace: record => ({ type: REPLACE, schema: name, payload: record }),
 
-    reducer: (initial, indexes, extension) => {
+    reducer: (initial, indexes = [], extension) => {
       const initialState = indexes.reduce((res, index) => (
         index.populate(res, initial)
       ), create(initial));

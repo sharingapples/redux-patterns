@@ -4,6 +4,7 @@ describe('createIndex specification', () => {
   it('checks for CRUD operations for index feature', () => {
     const schema = createSchema('scheme');
     const index = createIndex('departmentId', 'positionId');
+    const uniqueIndex = createIndex('positionId');
     const initalValue = [
       {
         id: 1, name: 'something', departmentId: 3, positionId: 2,
@@ -22,7 +23,7 @@ describe('createIndex specification', () => {
       },
     ];
     // initial value
-    const reducer = schema.reducer(initalValue, [index]);
+    const reducer = schema.reducer(initalValue, [index, uniqueIndex]);
     let state = reducer(undefined, schema);
 
     const initalIndexes = index.allIds(state, { departmentId: 3, positionId: 2 });
@@ -54,6 +55,10 @@ describe('createIndex specification', () => {
     const updatedIndex = index.allIds(state, { departmentId: 2, positionId: 6 });
     expect(updatedIndex[0]).toEqual(6);
 
+    // unique
+    const unique = index.unique(state, 'DEC');
+    console.log(unique)
+    // expect(unique.length).toEqual(4);
 
     // delete
     state = reducer(state, schema.delete(6));

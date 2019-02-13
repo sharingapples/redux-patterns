@@ -2,11 +2,11 @@ import {
   create, concat, remove, update, replace,
 } from './normalized';
 
-const INSERT = 'insert';
-const DELETE = 'delete';
-const UPDATE = 'update';
-const REPLACE = 'replace';
-const POPULATE = 'populate';
+const INSERT = 'db.insert';
+const DELETE = 'db.delete';
+const UPDATE = 'db.update';
+const REPLACE = 'db.replace';
+const POPULATE = 'db.populate';
 
 export default function createSchema(name) {
   return {
@@ -16,31 +16,57 @@ export default function createSchema(name) {
     update: record => ({ type: UPDATE, schema: name, payload: record }),
     replace: record => ({ type: REPLACE, schema: name, payload: record }),
 
-    reducer: (initial, extension) => {
+    reducer: (initial, indexes = [], extension) => {
       const initialState = create(initial);
+      indexes.forEach((index) => {
+        initialState[index.key] = index.populate(initial);
+      });
+
       return (state = initialState, action) => {
         if (action.schema !== name) {
           return state;
         }
 
-        switch (action.type) {
+        const { type, payload } = action;
+
+        switch (type) {
           case POPULATE:
-            return create(action.payload);
+            return indexes.reduce((res, index) => (
+              index.populate(res, payload, state)
+            ), create(payload));
 
           case INSERT:
-            return concat(state, action.payload);
+            return indexes.reduce((res, index) => ({
+              ...res,
+              [index.key]: index.insert(res[index.key], payload),
+            }), concat(state, payload));
 
-          case DELETE:
-            return remove(state, action.payload);
+          case DELETE: {
+            const prev = state.byId[payload];
+            return indexes.reduce((res, index) => ({
+              ...res,
+              [index.key]: index.delete(res[index.key], payload, prev),
+            }), remove(state, payload));
+          }
 
-          case UPDATE:
-            return update(state, action.payload.id, record => ({
+          case UPDATE: {
+            const prev = state.byId[payload.id];
+            return indexes.reduce((res, index) => ({
+              ...res,
+              [index.key]: index.update(res[index.key], payload, prev),
+            }), update(state, payload.id, record => ({
               ...record,
-              ...action.payload,
-            }));
+              ...payload,
+            })));
+          }
 
-          case REPLACE:
-            return replace(state, action.payload);
+          case REPLACE: {
+            const prev = state.byId[payload.id];
+            return indexes.reduce((res, index) => ({
+              ...res,
+              [index.key]: index.replace(res[index.key], payload, prev),
+            }), replace(state, payload));
+          }
 
           default:
             if (extension) {

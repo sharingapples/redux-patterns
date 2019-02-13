@@ -4,9 +4,13 @@ import shallowEqual from './shallowEqual';
 import observeStore from './observeStore';
 import * as normalized from './normalized';
 import createSchema from './createSchema';
+import createIndex, { Order } from './createIndex';
 
 export {
   createSchema,
+  createIndex,
+  Order,
+
   PartialReducer,
   // observe,
   observeStore,

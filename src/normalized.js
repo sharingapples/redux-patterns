@@ -49,6 +49,7 @@ export function create<T: Entity>(items: Array<T>, initial?: Object) {
 
 export function concat<T: Entity>(state: NormalizedState<T>, item: T) {
   return {
+    ...state,
     allIds: state.allIds.concat(item.id),
     byId: {
       ...state.byId,
@@ -69,7 +70,7 @@ export function update<T: Entity>(
   }
 
   return {
-    allIds: state.allIds,
+    ...state,
     byId: state.allIds.reduce((res, id) => ({
       ...res,
       [id]: id !== updateId ? state.byId[id] : modified,
@@ -83,13 +84,14 @@ export function replace<T: Entity>(state: NormalizedState<T>, record) {
 
   if (!state.byId[record.id]) {
     return {
+      ...state,
       allIds: state.allIds.concat(record.id),
       byId,
     };
   }
 
   return {
-    allIds: state.allIds,
+    ...state,
     byId,
   };
 }
@@ -107,6 +109,7 @@ export function remove<T: Entity>(
   const copy = Object.assign({}, state.byId);
   delete copy[id];
   return {
+    ...state,
     allIds: state.allIds.filter(i => i !== id),
     byId: copy,
   };
@@ -118,7 +121,7 @@ export function updateAt<T: Entity>(
   updater: UpdateFn<T>
 ) {
   return {
-    allIds: state.allIds,
+    ...state,
     byId: state.allIds.reduce((res, id, i, src) => ({
       ...res,
       [id]: idx !== i ? state.byId[id] : updater(state.byId[id], i, src),
@@ -136,7 +139,7 @@ export function updateAtTurn<T: Entity>(
 
 export function updateAll<T: Entity>(state: NormalizedState<T>, updater: UpdateFn<T>) {
   return {
-    allIds: state.allIds,
+    ...state,
     byId: state.allIds.reduce((res, id, idx, src) => ({
       ...res,
       [id]: updater(state.byId[id], idx, src),

@@ -22,6 +22,32 @@ store.dispatch(user.update({ id: 1, name: 'jane', type: 'admin' }));
 store.dispatch(user.replace({ id: 1, name: 'smith' }));
 ```
 
+## Index
+Use `createIndex` to create a index on one or more fields of the
+schema;
+
+```javascript
+import { createIndex, createSchema, Order } from 'redux-patterns';
+
+// create index with a unique name, and a value extractor
+const JoinedIndex = createIndex('joined', (rec) => moment(rec.joined).format('YYYYMMDD'), Order.DESC);
+
+const User = createSchema('user', [JoinedIndex]);
+const reducer = combineReducers({ user: User.reducer([
+  { id: 1, joined: new Date('2019-01-01T06:00')},
+  { id: 2, joined: new Date('2019-01-02T06:03')},
+])});
+
+const store = createStore(reducer);
+
+// Extract all unique values for the index
+JoinedIndex.values(store.getState().user); // ['20190102', '20190101']
+
+// Extract all ids for the given index value
+JoinedIndex.allIds(store.getState().user, '20190102'); // [1]
+JoinedIndex.allIds(store.getState().user, JoinedIndex.getValue(rec));
+```
+
 ## PartialReducer
 A partial reducer encourages defining an action and it's
 corresponding reducer effect at the same place.

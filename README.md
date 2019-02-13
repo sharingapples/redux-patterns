@@ -30,7 +30,7 @@ schema;
 import { createIndex, createSchema, Order } from 'redux-patterns';
 
 // create index with a unique name, and a value extractor
-const JoinedIndex = createIndex('joined', (rec) => moment(rec.joined).format('YYYYMMDD'). Order.DESC);
+const JoinedIndex = createIndex('joined', rec => moment(rec.joined).format('YYYYMMDD'), Order.DESC);
 
 const User = createSchema('user', [JoinedIndex]);
 const reducer = combineReducers({ user: User.reducer([

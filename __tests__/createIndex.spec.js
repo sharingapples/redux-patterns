@@ -1,69 +1,102 @@
-import { createSchema, createIndex } from '../src';
+import { createSchema, createIndex, Order } from '../src';
 
 describe('createIndex specification', () => {
   it('checks for CRUD operations for index feature', () => {
-    const schema = createSchema('scheme');
-    const index = createIndex('departmentId', 'positionId');
-    const uniqueIndex = createIndex('positionId');
-    const initalValue = [
-      {
-        id: 1, name: 'something', departmentId: 3, positionId: 2,
-      },
-      {
-        id: 2, name: 'something', departmentId: 3, positionId: 2,
-      },
-      {
-        id: 3, name: 'something', departmentId: 3, positionId: 2,
-      },
-      {
-        id: 4, name: 'something', departmentId: 3, positionId: 2,
-      },
-      {
-        id: 5, name: 'something', departmentId: 3, positionId: 2,
-      },
+    const Appointments = createSchema('appointments');
+    const appointmentDateIndex = createIndex('appointmentDate', rec => rec.date.getMonth() + 1);
+    const initialValues = [
+      { id: 1, date: new Date('2019-02-11'), patient: 'A' },
+      { id: 2, date: new Date('2019-02-12'), patient: 'B' },
+      { id: 3, date: new Date('2019-02-13'), patient: 'C' },
+      { id: 4, date: new Date('2019-03-01'), patient: 'D' },
     ];
-    // initial value
-    const reducer = schema.reducer(initalValue, [index, uniqueIndex]);
-    let state = reducer(undefined, schema);
 
-    const initalIndexes = index.allIds(state, { departmentId: 3, positionId: 2 });
-    expect(initalIndexes.length).toEqual(5);
+    const reducer = Appointments.reducer(initialValues, [appointmentDateIndex]);
 
-    const newValue = {
-      id: 6,
-      name: 'John Doe',
-      departmentId: 3,
-      positionId: 5,
-    };
+    // Initialize the state
+    let state = reducer(undefined, { type: 'INIT' });
+    expect(appointmentDateIndex.values(state)).toEqual([2, 3]);
+    expect(appointmentDateIndex.allIds(state, 2)).toEqual([1, 2, 3]);
+    expect(appointmentDateIndex.allIds(state, 3)).toEqual([4]);
 
-    // insert
-    state = reducer(undefined, schema.insert(newValue));
-    const firstIndex = index.allIds(state, { departmentId: 3, positionId: 5 });
-    expect(firstIndex[0]).toEqual(6);
-
-    // replace
-    state = reducer(state, schema.replace({ id: 6, name: 'jane D' }));
-    const replacedIndex = index.allIds(state, { departmentId: null, positionId: null });
-    expect(replacedIndex[0]).toEqual(6);
-
-
-    // update
-    state = reducer(state, schema.update({
-      id: 6, name: 'Lore Epsum', departmentId: 2, positionId: 6,
+    // Check data insertion
+    state = reducer(state, Appointments.insert({
+      id: 5, date: new Date('2019-03-02'), patient: 'D',
     }));
+    expect(appointmentDateIndex.values(state)).toEqual([2, 3]);
+    expect(appointmentDateIndex.allIds(state, 2)).toEqual([1, 2, 3]);
+    expect(appointmentDateIndex.allIds(state, 3)).toEqual([4, 5]);
 
-    const updatedIndex = index.allIds(state, { departmentId: 2, positionId: 6 });
-    expect(updatedIndex[0]).toEqual(6);
+    // Check data update
+    state = reducer(state, Appointments.update({
+      id: 1, date: new Date('2019-02-14'),
+    }));
+    expect(appointmentDateIndex.values(state)).toEqual([2, 3]);
+    expect(appointmentDateIndex.allIds(state, 2)).toEqual([1, 2, 3]);
+    expect(appointmentDateIndex.allIds(state, 3)).toEqual([4, 5]);
 
-    // unique
-    const unique = uniqueIndex.unique(state, 'DESC');
-    expect(unique).toEqual(['6', '5', '2', 'undefined']);
+    // Check data update changing index value
+    state = reducer(state, Appointments.update({
+      id: 1, date: new Date('2019-03-01'),
+    }));
+    expect(appointmentDateIndex.values(state)).toEqual([2, 3]);
+    expect(appointmentDateIndex.allIds(state, 2)).toEqual([2, 3]);
+    expect(appointmentDateIndex.allIds(state, 3)).toEqual([4, 5, 1]);
 
-    expect(index.unique(state, 'ASC')).toEqual(['2:6', '3:2', '3:5', ':']);
+    // Check data replace changing index
+    state = reducer(state, Appointments.replace({
+      id: 2, date: new Date('2019-03-01'), patient: 'K',
+    }));
+    expect(appointmentDateIndex.values(state)).toEqual([2, 3]);
+    expect(appointmentDateIndex.allIds(state, 2)).toEqual([3]);
+    expect(appointmentDateIndex.allIds(state, 3)).toEqual([4, 5, 1, 2]);
 
-    // delete
-    state = reducer(state, schema.delete(6));
-    const deletedIndex = index.allIds(state, { departmentId: null, positionId: null });
-    expect(deletedIndex.length).toEqual(0);
+    // Check complete removal of index
+    state = reducer(state, Appointments.delete(3));
+    expect(appointmentDateIndex.values(state)).toEqual([3]);
+    expect(appointmentDateIndex.allIds(state, 2)).toEqual(undefined);
+    expect(appointmentDateIndex.allIds(state, 3)).toEqual([4, 5, 1, 2]);
+  });
+
+  it('check order feature', () => {
+    const Appointments = createSchema('appointments');
+    const appointmentDateIndex = createIndex('appointmentDate', rec => rec.date.getMonth() + 1, Order.DESC);
+    const initialValues = [
+      { id: 1, date: new Date('2019-02-11'), patient: 'A' },
+      { id: 2, date: new Date('2019-02-12'), patient: 'B' },
+      { id: 3, date: new Date('2019-02-13'), patient: 'C' },
+      { id: 4, date: new Date('2019-03-01'), patient: 'D' },
+    ];
+
+    const reducer = Appointments.reducer(initialValues, [appointmentDateIndex]);
+
+    // Initialize the state
+    let state = reducer(undefined, { type: 'INIT' });
+    expect(appointmentDateIndex.values(state)).toEqual([3, 2]);
+
+    // append some more data
+    state = reducer(state, Appointments.insert({
+      id: 5, date: new Date('2019-05-02'), patient: 'K',
+    }));
+    expect(appointmentDateIndex.values(state)).toEqual([5, 3, 2]);
+
+    // append something that goes at the end
+    state = reducer(state, Appointments.insert({
+      id: 5, date: new Date('2019-01-02'), patient: 'K',
+    }));
+    expect(appointmentDateIndex.values(state)).toEqual([5, 3, 2, 1]);
+
+    // append something that goes in the middle
+    state = reducer(state, Appointments.insert({
+      id: 5, date: new Date('2019-04-02'), patient: 'K',
+    }));
+    const values = appointmentDateIndex.values(state);
+    expect(values).toEqual([5, 4, 3, 2, 1]);
+
+    // append something that doesn't change anything
+    state = reducer(state, Appointments.insert({
+      id: 5, date: new Date('2019-04-05'), patient: 'K',
+    }));
+    expect(appointmentDateIndex.values(state)).toBe(values);
   });
 });

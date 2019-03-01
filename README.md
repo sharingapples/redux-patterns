@@ -4,6 +4,10 @@
   - observeStore
   - observe Component
 
+* Helper Functions (To use with react-redux)
+  * createAreStatePropsEqual
+  * shallowArrayEquals
+
 ## Schema
 ```javascript
 import { createSchema } from 'redux-patterns'

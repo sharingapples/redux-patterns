@@ -4,6 +4,10 @@
   - observeStore
   - observe Component
 
+* Helper Functions (To use with react-redux)
+  * createAreStatePropsEqual
+  * shallowArrayEquals
+
 ## Schema
 ```javascript
 import { createSchema } from 'redux-patterns'
@@ -30,7 +34,11 @@ schema;
 import { createIndex, createSchema, Order } from 'redux-patterns';
 
 // create index with a unique name, and a value extractor
+<<<<<<< HEAD
 const JoinedIndex = createIndex('joined', (rec) => moment(rec.joined).format('YYYYMMDD'), Order.DESC);
+=======
+const JoinedIndex = createIndex('joined', rec => moment(rec.joined).format('YYYYMMDD'), Order.DESC);
+>>>>>>> 0a0e9b7fb9b0ffcbbf6b18649d73331a2b14c305
 
 const User = createSchema('user', [JoinedIndex]);
 const reducer = combineReducers({ user: User.reducer([

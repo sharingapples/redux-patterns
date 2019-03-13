@@ -74,6 +74,11 @@ export default function createIndex(name, extractor, comparator) {
     // Retrieve all unique index values
     values: state => state[key].all,
 
+    // Support working on the just the indexed part of the schema
+    index: state => state[key],
+    indexedValues: index => index.all,
+    indexedIds: (index, value) => index.by[value],
+
     populate: (records) => {
       const indexed = {
         all: [],

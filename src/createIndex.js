@@ -60,6 +60,11 @@ function append(state, k, id, comparator) {
 }
 /* eslint-enable no-param-reassign */
 
+const INITIAL_STATE = {
+  all: [],
+  by: {},
+};
+
 export default function createIndex(name, extractor, comparator) {
   const key = name;
   const getValue = extractor || (record => record[name]);
@@ -103,7 +108,7 @@ export default function createIndex(name, extractor, comparator) {
       return indexed;
     },
 
-    insert: (state, record) => {
+    insert: (state = INITIAL_STATE, record) => {
       const k = getValue(record);
       return append({
         by: Object.assign({}, state.by),
@@ -111,7 +116,7 @@ export default function createIndex(name, extractor, comparator) {
       }, k, record.id, comparator);
     },
 
-    delete: (state, id, record) => {
+    delete: (state = INITIAL_STATE, id, record) => {
       const k = getValue(record);
       const res = {
         by: Object.assign({}, state.by),
@@ -121,7 +126,7 @@ export default function createIndex(name, extractor, comparator) {
       return res;
     },
 
-    update: (state, updates, record) => {
+    update: (state = INITIAL_STATE, updates, record) => {
       const prevK = getValue(record);
       const newK = getValue(Object.assign({}, record, updates));
       if (prevK === newK) {
@@ -139,7 +144,7 @@ export default function createIndex(name, extractor, comparator) {
       return res;
     },
 
-    replace: (state, replacement, record) => {
+    replace: (state = INITIAL_STATE, replacement, record) => {
       const newK = getValue(replacement);
       const res = {
         by: Object.assign({}, state.by),

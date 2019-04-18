@@ -97,6 +97,6 @@ describe('createIndex specification', () => {
     state = reducer(state, Appointments.insert({
       id: 5, date: new Date('2019-04-05'), patient: 'K',
     }));
-    expect(appointmentDateIndex.values(state)).toBe(values);
+    expect(appointmentDateIndex.values(state)).toBe(null);
   });
 });

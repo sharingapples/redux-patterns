@@ -24,6 +24,7 @@ store.dispatch(user.insert({ id: 1, name: 'john' }));
 store.dispatch(user.delete(1));
 store.dispatch(user.update({ id: 1, name: 'jane', type: 'admin' }));
 store.dispatch(user.replace({ id: 1, name: 'smith' }));
+store.dispatch(user.upsert({ id: 2, name: 'will' }));
 ```
 
 ## Index

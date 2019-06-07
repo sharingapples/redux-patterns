@@ -100,9 +100,9 @@ describe('createIndex specification', () => {
     expect(appointmentDateIndex.values(state)).toBe(values);
   });
 
-  it('upsert', () => {
+  it('upsert a record into index', () => {
     const schema = createSchema('schema');
-    const index = createIndex('langId', rec => rec.languageId);
+    const index = createIndex('langId', rec => rec.languageId, Order.DESC);
     const initialValues = [
       { id: 1, language: 'Javascript', languageId: '11' },
       { id: 3, language: 'Ruby', languageId: '13' },
@@ -110,8 +110,9 @@ describe('createIndex specification', () => {
       { id: 2, language: 'Python', languageId: '12' },
     ];
     const reducer = schema.reducer(initialValues, [index]);
-    const state = reducer(undefined, { type: 'INIT' });
+    let state = reducer(undefined, { type: 'INIT' });
+    state = reducer(state, schema.upsert({ id: 0, name: 'Erlang', languageId: '13' }));
 
-    expect(index.allIds(state, '13')).toEqual([3, 4]);
+    expect(index.allIds(state, '13')).toEqual([3, 4, 0]);
   });
 });

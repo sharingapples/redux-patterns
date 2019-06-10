@@ -1,5 +1,5 @@
 import {
-  create, concat, remove, update, replace,
+  create, concat, remove, update, replace, upsert,
 } from './normalized';
 
 const INSERT = 'db.insert';
@@ -7,6 +7,7 @@ const DELETE = 'db.delete';
 const UPDATE = 'db.update';
 const REPLACE = 'db.replace';
 const POPULATE = 'db.populate';
+const UPSERT = 'db.upsert';
 
 export default function createSchema(name) {
   return {
@@ -15,6 +16,7 @@ export default function createSchema(name) {
     delete: id => ({ type: DELETE, schema: name, payload: id }),
     update: record => ({ type: UPDATE, schema: name, payload: record }),
     replace: record => ({ type: REPLACE, schema: name, payload: record }),
+    upsert: record => ({ type: UPSERT, schema: name, payload: record }),
 
     reducer: (initial, indexes = [], extension) => {
       const initialState = create(initial);
@@ -66,6 +68,14 @@ export default function createSchema(name) {
               ...res,
               [index.key]: index.replace(res[index.key], payload, prev),
             }), replace(state, payload));
+          }
+
+          case UPSERT: {
+            const prev = state.byId[payload.id];
+            return indexes.reduce((res, index) => ({
+              ...res,
+              [index.key]: index.upsert(res[index.key], payload, prev),
+            }), upsert(state, payload));
           }
 
           default:

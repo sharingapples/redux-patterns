@@ -164,5 +164,33 @@ export default function createIndex(name, extractor, comparator) {
       remove(res, prevK, record.id, comparator);
       return append(res, newK, replacement.id, comparator);
     },
+
+    upsert: (state = INITIAL_STATE, replacement, record) => {
+      if (!record) {
+        const k = getValue(replacement);
+        const res = {
+          by: Object.assign({}, state.by),
+          all: state.all,
+        };
+
+        return append(res, k, replacement.id, comparator);
+      }
+
+      const prevK = getValue(record);
+      const newK = getValue(Object.assign({}, record, replacement));
+      if (prevK === newK) {
+        return state;
+      }
+
+      const res = {
+        by: Object.assign({}, state.by),
+        all: state.all,
+      };
+
+      remove(res, prevK, record.id, comparator);
+      append(res, newK, record.id, comparator);
+
+      return res;
+    },
   };
 }

@@ -14,11 +14,11 @@ export type UpdateFn<T: Entity> = (T, number, Array<string>) => any;
 export type ReduceFn<T: Entity> = (any, T, number, Array<string>) => any;
 export type FilterFn<T: Entity> = (T, number, Array<T>) => any;
 
-export function get<T:Entity>(state: NormalizedState<T>, id: string): T {
+export function get<T: Entity>(state: NormalizedState<T>, id: string): T {
   return state.byId[id];
 }
 
-export function allIds(state: NormalizedState<*>) : Array<string> {
+export function allIds(state: NormalizedState<*>): Array<string> {
   return state.allIds;
 }
 
@@ -93,6 +93,34 @@ export function replace<T: Entity>(state: NormalizedState<T>, record) {
   return {
     ...state,
     byId,
+  };
+}
+
+export function upsert<T: Entity>(state: NormalizedState<T>, record) {
+  const recordInTheState = Boolean(state.byId[record.id]);
+
+  if (recordInTheState) {
+    // update the record in the state.
+    return {
+      ...state,
+      byId: {
+        ...state.byId,
+        [record.id]: {
+          ...state.byId[record.id],
+          ...record,
+        },
+      },
+    };
+  }
+
+  // insert the record in the state
+  return {
+    ...state,
+    allIds: state.allIds.concat(record.id),
+    byId: {
+      ...state.byId,
+      [record.id]: record,
+    },
   };
 }
 

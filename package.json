@@ -4,7 +4,6 @@
   "description": "A redux based patterns",
   "repository": "github:sharingapples/redux-patterns",
   "main": "dist/index.js",
-  "module": "src/index.js",
   "react-native": "src/index.js",
   "files": [
     "dist",
